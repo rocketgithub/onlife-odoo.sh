@@ -1,0 +1,7 @@
+[submodule "l10n_sv"]
+	path = l10n_sv
+	url = git@github.com:rocketgithub/l10n_sv.git
+	branch = 13.0
+[submodule "onlife"]
+	path = onlife
+	url = git@github.com:rocketgithub/onlife.git
