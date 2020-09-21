@@ -5,3 +5,6 @@
 [submodule "onlife"]
 	path = onlife
 	url = git@github.com:rocketgithub/onlife.git
+[submodule "hr_expense_invoice"]
+	path = hr_expense_invoice
+	url = git@github.com:rocketgithub/hr_expense_invoice.git
