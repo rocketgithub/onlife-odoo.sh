@@ -5,3 +5,10 @@
 [submodule "onlife"]
 	path = onlife
 	url = git@github.com:rocketgithub/onlife.git
+[submodule "conciliacion_bancaria"]
+	path = conciliacion_bancaria
+	url = git@github.com:rocketgithub/conciliacion_bancaria.git
+	branch = 13.0
+[submodule "hr_expense_invoice"]
+	path = hr_expense_invoice
+	url = git@github.com:rocketgithub/hr_expense_invoice.git
