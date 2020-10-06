@@ -12,3 +12,6 @@
 [submodule "hr_expense_invoice"]
 	path = hr_expense_invoice
 	url = git@github.com:rocketgithub/hr_expense_invoice.git
+[submodule "sinc_bigcommerce"]
+	path = sinc_bigcommerce
+	url = git@github.com:rocketgithub/sinc_bigcommerce.git
