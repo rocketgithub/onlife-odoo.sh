@@ -12,3 +12,6 @@
 	path = conciliacion_bancaria
 	url = git@github.com:rocketgithub/conciliacion_bancaria.git
 	branch = 13.0
+[submodule "sinc_bigcommerce"]
+	path = sinc_bigcommerce
+	url = git@github.com:rocketgithub/sinc_bigcommerce.git
