@@ -15,3 +15,6 @@
 [submodule "sinc_bigcommerce"]
 	path = sinc_bigcommerce
 	url = git@github.com:rocketgithub/sinc_bigcommerce.git
+[submodule "l10n_sv_extra"]
+	path = l10n_sv_extra
+	url = git@github.com:rocketgithub/l10n_sv_extra.git
