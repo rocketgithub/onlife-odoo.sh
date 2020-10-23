@@ -18,3 +18,6 @@
 [submodule "l10n_sv_extra"]
 	path = l10n_sv_extra
 	url = git@github.com:rocketgithub/l10n_sv_extra.git
+[submodule "pos_sv"]
+	path = pos_sv
+	url = git@github.com:rocketgithub/pos_sv.git
