@@ -13,7 +13,7 @@
     'email': "dev@pybrains.com",
     'website': "http://www.pybrains.com",
     'category': 'Base',
-    'version': '13.0.1.1',
+    'version': '13.0.1.2',
 
     'depends': [
         'base',

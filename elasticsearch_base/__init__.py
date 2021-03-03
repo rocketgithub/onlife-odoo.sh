@@ -5,6 +5,8 @@ from odoo.exceptions import MissingError
 from odoo import api, fields
 from odoo import models as Models
 
+from odoo.addons.elasticsearch_base.tools.index import update_data_keys
+
 
 def field_convert_to_read_json(self, value, record, use_name_get=True):
     if isinstance(value, bytes):
@@ -101,7 +103,7 @@ def read_json(self, fields=None, load='_classic_read'):
                 vals[name] = convert(record[name], record, use_name_get)
             except MissingError:
                 vals.clear()
-    result = [vals for record, vals in data if vals]
+    result = [update_data_keys(vals) for record, vals in data if vals]
 
     return result
 

@@ -13,6 +13,28 @@ FIELD_FILTER_DOMAIN = [
     ('ttype', 'in', ['many2one', 'many2many', 'one2many'])
 ]
 
+PRODUCT_FIELD_MAPPING = {'list_price': 'calculated_price',
+                         'public_categ_ids': 'categories',
+                         'sale_ok': 'is_visible',
+                         'marca_id': 'brand'}
+
+
+def update_data_keys(dict_):
+    new_dict = {}
+    images = []
+    for k, v in dict_.items():
+        new_k = PRODUCT_FIELD_MAPPING.get(k)
+        if new_k:
+            new_dict[new_k] = dict_[k]
+        elif k.startswith('image'):
+            images.append({'product_id': dict_['id'],
+                           'url_standard': dict_[k]})
+        else:
+            new_dict[k] = v
+    if images:
+        new_dict['images'] = images
+    return new_dict
+
 
 def get_relevant_models(self, model_ids):
     field_obj = self.env['ir.model.fields']

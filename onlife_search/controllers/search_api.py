@@ -1,4 +1,5 @@
 import json
+import math
 
 from odoo.http import Controller, route, request
 
@@ -8,6 +9,8 @@ def get_sort_keys(s, d):
     for s_key in s.split(','):
         if s_key == 'name':
             s_key = 'name.keyword'
+        if s_key == 'price':
+            s_key = 'calculated_price'
         if d and d in ('asc', 'desc'):
             sort_keys.append({s_key: d})
         else:
@@ -46,35 +49,49 @@ class OnlifeSearchAPI(Controller):
                 "name": keyword
             }))
 
-        # It is assumed that marca_id (the brand) is indexed
+        # It is assumed that marca_id (the brand field) is indexed
         if brandId:
             must.append(dict(term={
-                "marca_id.id": {
-                    "value": brandId
+                "brand.id": {
+                    'value': brandId
                 }
             }))
 
         if brandName:
             must.append(dict(match={
-                "marca_id.name": brandName
+                "brand.name": brandName
             }))
 
         if must:
-            data["query"]["bool"].update({
-                "must": must
-            })
+            data["query"]["bool"].update(dict(must=must))
 
         # It is assumed that list_price is indexed
         if max_ or min_:
             data["query"]["bool"].update(dict(filter={
-                "range": dict(list_price={
-                    "gte": float(min_) or None,
-                    "lte": float(max_) or None,
-                })
+                "range": {
+                    'calculated_price': {
+                        "gte": float(min_) or None,
+                        "lte": float(max_) or None,
+                    }
+                }
             }))
 
         if sort:
             data.update({"sort": get_sort_keys(sort, direction)})
 
         res = request.env['es.search'].query(index=product_index.name, body=data)
-        return json.dumps(res)
+
+        hits_res = map(lambda r: r['_source'], res['hits']['hits'])
+        total_hits = res['hits']['total']['value']
+
+        meta = {'meta': {
+            "pagination": {
+                "count": limit,
+                "total": total_hits,
+                "current_page": page,
+                "per_page": limit,
+                "total_pages": math.ceil(total_hits / int(limit))
+            }
+        }}
+
+        return json.dumps(dict(data=list(hits_res), meta=meta))
