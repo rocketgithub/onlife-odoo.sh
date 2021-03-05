@@ -2,7 +2,7 @@
 {
     # App information
     'name': "Fuzzy Search API for OnLife",
-    'version': '13.0.1.4',
+    'version': '13.0.1.5',
     'category': 'Inventory',
     'summary': """
 Provides Fuzzy Search API for OnLife""",
