@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # noinspection PyStatementEffect
 {
-    'name': "Elasticsearch Indexing",
+    'name': "Elasticsearch Base",
     'summary': """
-        Provides base module for indexing model data to Elasticsearch""",
+        Provides base module for Elasticsearch-ing Odoo records.""",
 
     'description': """
         Odoo Elasticsearch
@@ -13,7 +13,7 @@
     'email': "dev@pybrains.com",
     'website': "http://www.pybrains.com",
     'category': 'Base',
-    'version': '13.0.1.5',
+    'version': '13.0.1.4',
 
     'depends': [
         'base',
