@@ -79,7 +79,7 @@ class OnlifeSearchAPI(Controller):
         hits_res = map(lambda r: r['_source'], hits)
         total_hits = res['hits']['total']['value']
 
-        meta = dict(meta=dict(pagination=dict(count=len(hits), total=total_hits, current_page=page, per_page=limit,
-                                              total_pages=ceil(total_hits / int(limit)))))
+        meta = dict(pagination=dict(count=len(hits), total=total_hits, current_page=page, per_page=limit,
+                                    total_pages=ceil(total_hits / int(limit))))
 
         return json.dumps(dict(data=list(hits_res), meta=meta))
