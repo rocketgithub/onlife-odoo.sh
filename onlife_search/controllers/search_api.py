@@ -26,8 +26,7 @@ class OnlifeSearchAPI(Controller):
 
         # Prevent from overriding the global functions max and min
         params = request.params
-        max_ = params.get('max', 0)
-        min_ = params.get('min', 0)
+        max_, min_ = params.get('max', 0), params.get('min', 0)
 
         try:
             offset = int(page) * int(limit)
@@ -40,46 +39,27 @@ class OnlifeSearchAPI(Controller):
             "from": offset,
         }
 
-        should = []
         must = []
-
         if keyword:
-            keywords = keyword.split(',')
-            for kw in keywords:
-                should.extend([dict(fuzzy={
-                    "name": {
-                        "value": kw,
-                        "boost": 6,
-
-                    }
-                }), dict(fuzzy={
-                    "description": {
-                        "value": kw,
-                        "boost": 2,
-                    }
-                })])
-
-        # Assumes that brand (the marca_id field) is indexed
+            must.append(dict(multi_match={
+                "query": ' '.join(keyword.split(',')),
+                "fields": ["name^6.0", "description^2.0"],
+                "fuzziness": "AUTO"
+            }))
         if brandId:
             must.append(dict(term={
                 "brand.id": {
                     'value': brandId
                 }
             }))
-
         if brandName:
             must.append(dict(match={
                 "brand.name": brandName
             }))
 
-        query_bool = data["query"]["bool"]
-        if should:
-            query_bool.update(dict(should=should))
-
         if must:
-            query_bool.update(dict(must=must))
+            data["query"]["bool"].update(dict(must=must))
 
-        # Assumes that calculated_price (the list_price field) is indexed
         if max_ or min_:
             data.update(dict(post_filter={
                 "range": {

@@ -12,15 +12,17 @@
                     <field name="index_exists"/>
                     <field name="fields_include"/>
                     <button name="action_create_index" type="object" string="Create Index" class="btn btn-primary"/>
-                    <button name="action_bulk_document" type="object" string="Bulk Dcouments" class="btn btn-primary"/>
-                    <button name="action_create_document" type="object" string="Add Dcouments" class="btn btn-primary"/>
+                    <button name="action_bulk_document" type="object" string="Bulk Documents" class="btn btn-primary"/>
+                    <button name="action_create_document" type="object" string="Add Documents" class="btn btn-primary"/>
                     <button name="action_update_document" type="object" string="Update Documents"
                             class="btn btn-primary"/>
-                    <button name="action_refresh_index" type="object" string="Refesh Index" class="btn"/>
+                    <button name="action_refresh_index" type="object" string="Refresh Index" class="btn"/>
+                    <!--
                     <button name="action_get_index" type="object" string="Get Index" class="btn"/>
                     <button name="action_put_mapping" type="object" string="Put Mapping" class="btn"/>
                     <button name="action_check_index" type="object" string="Check Index" class="btn"/>
                     <button name="action_delete_index" type="object" string="Delete Index" class="btn"/>
+                    -->
                 </tree>
             </field>
         </record>
@@ -32,7 +34,7 @@
                 <form string="Search Engine Index">
                     <header>
                         <button name="action_create_index" type="object" string="Create Index" class="btn btn-primary"/>
-                        <button name="action_bulk_document" type="object" string="Bulk Dcouments"
+                        <button name="action_bulk_document" type="object" string="Bulk Documents"
                                 class="btn btn-primary"/>
                         <button name="action_create_document" type="object" string="Add Documents"
                                 class="btn btn-primary"/>
@@ -40,9 +42,11 @@
                                 class="btn btn-primary"/>
                         <button name="action_refresh_index" type="object" string="Refresh Index" class="btn"/>
                         <button name="action_get_index" type="object" string="Get Index" class="btn"/>
+                        <!--
                         <button name="action_put_settings" type="object" string="Put Setting" class="btn"/>
                         <button name="action_put_mapping" type="object" string="Put Mapping" class="btn"/>
                         <button name="action_check_index" type="object" string="Check Index" class="btn"/>
+                        -->
                         <button name="action_delete_index" type="object" string="Delete Index" class="btn"/>
                     </header>
                     <group>
@@ -56,8 +60,10 @@
                     </group>
                     <group>
                         <field name="fields_include" style="word-break:break-all" placeholder="[]"/>
+                        <!--
                         <field name="settings"/>
                         <field name="mapping"/>
+                        -->
                         <field name="index_info"/>
                     </group>
                 </form>

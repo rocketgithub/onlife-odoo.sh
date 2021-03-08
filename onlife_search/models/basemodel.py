@@ -7,7 +7,7 @@ PRODUCT_FIELD_MAPPING = dict([('sinc_id', 'id'),
                               ('sale_ok', 'is_visible'),
                               ('marca_id', 'brand')])
 
-PRODUCT_DEFAULT_FIELDS = ['sinc_id', 'name', 'list_price', 'sale_ok', 'marca_id', 'description']
+DEFAULT_PRODUCT_FIELDS = ['sinc_id', 'name', 'list_price', 'sale_ok', 'marca_id', 'description']
 
 
 def update_data_keys(dict_):
@@ -38,7 +38,7 @@ class BaseModelExtend(models.AbstractModel):
         def search_read_json(self, domain=None, fields=None, offset=0, limit=None, order=None):
             product_model = self._name == 'product.template'
             if product_model:
-                fields = list(set(PRODUCT_DEFAULT_FIELDS + fields))
+                fields = list(set(DEFAULT_PRODUCT_FIELDS + fields))
             res = origin_search_read_json(self=self,domain=domain, fields=fields,
                                           offset=offset, limit=limit, order=order)
             return [update_data_keys(vals) for vals in res] if product_model else res
