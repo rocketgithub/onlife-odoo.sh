@@ -39,13 +39,20 @@ class OnlifeSearchAPI(Controller):
             "from": offset,
         }
 
-        must = []
+        should, must = [], []
+        search_fields = ["name^8.0", "description^2.0"]
         if keyword:
-            must.append(dict(multi_match={
+            should.extend([dict(multi_match={
                 "query": ' '.join(keyword.split(',')),
-                "fields": ["name^6.0", "description^2.0"],
+                "type": "phrase",
+                "fields": search_fields,
+                "boost": "10"
+            }), dict(multi_match={
+                "query": ' '.join(keyword.split(',')),
+                "type": "most_fields",
+                "fields": search_fields,
                 "fuzziness": "AUTO"
-            }))
+            })])
         if brandId:
             must.append(dict(term={
                 "brand.id": {
@@ -56,6 +63,9 @@ class OnlifeSearchAPI(Controller):
             must.append(dict(match={
                 "brand.name": brandName
             }))
+
+        if should:
+            data["query"]["bool"].update(dict(should=should))
 
         if must:
             data["query"]["bool"].update(dict(must=must))
