@@ -19,7 +19,7 @@ def get_sort_keys(s, d):
 
 class OnlifeSearchAPI(Controller):
 
-    @route('/api/product/search', type='http', methods=['GET'], auth='user', csrf=False)
+    @route('/api/product/search', type='http', methods=['GET'], auth='none', csrf=False)
     def product_fuzzy_search(self, keyword=None, brandId=None, brandName=None,
                              limit=20, page=0, sort=None, direction=None):
         product_index = request.env['es.index'].sudo().search([('model_id.model', '=', 'product.template')], limit=1)
