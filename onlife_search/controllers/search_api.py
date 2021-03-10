@@ -40,15 +40,21 @@ class OnlifeSearchAPI(Controller):
         }
 
         should, must = [], []
+        query_list = keyword.split(',')
         search_fields = ["name^8.0", "description^2.0"]
+
         if keyword:
             should.extend([dict(multi_match={
-                "query": ' '.join(keyword.split(',')),
+                "query": ' '.join(query_list),
                 "type": "phrase",
                 "fields": search_fields,
                 "boost": "10"
+            }), dict(query_string={
+                "query": ' '.join(map(lambda k: k + '*', query_list)),
+                "fields": search_fields,
+                "boost": "5"
             }), dict(multi_match={
-                "query": ' '.join(keyword.split(',')),
+                "query": ' '.join(query_list),
                 "type": "most_fields",
                 "fields": search_fields,
                 "fuzziness": "AUTO"
@@ -84,7 +90,6 @@ class OnlifeSearchAPI(Controller):
             data.update({"sort": get_sort_keys(sort, direction)})
 
         res = request.env['es.search'].query(index=product_index.name, body=data)
-
         hits = res['hits']['hits']
         hits_res = map(lambda r: r['_source'], hits)
         total_hits = res['hits']['total']['value']
