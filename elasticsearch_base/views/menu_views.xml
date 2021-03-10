@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+
+        <menuitem name="Elasticsearch" id="elasticsearch_root_menu"
+                  web_icon="elasticsearch_base,static/description/icon.png"
+                  sequence="40"/>
+
+        <menuitem id="menu_elasticsearch_configuration" name="Configuration" parent="elasticsearch_root_menu"
+                  sequence="90"/>
+
+    </data>
+</odoo>
