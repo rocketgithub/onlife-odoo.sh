@@ -7,7 +7,7 @@ PRODUCT_FIELD_MAPPING = dict([('sinc_id', 'id'),
                               ('sale_ok', 'is_visible'),
                               ('marca_id', 'brand')])
 
-DEFAULT_PRODUCT_FIELDS = ['sinc_id', 'name', 'list_price', 'sale_ok', 'marca_id', 'description']
+DEFAULT_PRODUCT_FIELDS = ['sinc_id', 'name', 'list_price', 'sale_ok', 'marca_id', 'description', 'keywords']
 
 
 def update_data_keys(dict_):

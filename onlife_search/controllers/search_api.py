@@ -40,15 +40,21 @@ class OnlifeSearchAPI(Controller):
         }
 
         should, must = [], []
-        search_fields = ["name^8.0", "description^2.0"]
+        query_list = keyword.split(',')
+        search_fields = ["keywords^10.0", "name^8.0", "description^2.0"]
+
         if keyword:
             should.extend([dict(multi_match={
-                "query": ' '.join(keyword.split(',')),
+                "query": ' '.join(query_list),
                 "type": "phrase",
                 "fields": search_fields,
                 "boost": "10"
+            }), dict(query_string={
+                "query": ' '.join(map(lambda k: k + '*', query_list)),
+                "fields": search_fields,
+                "boost": "5"
             }), dict(multi_match={
-                "query": ' '.join(keyword.split(',')),
+                "query": ' '.join(query_list),
                 "type": "most_fields",
                 "fields": search_fields,
                 "fuzziness": "AUTO"
@@ -84,12 +90,10 @@ class OnlifeSearchAPI(Controller):
             data.update({"sort": get_sort_keys(sort, direction)})
 
         res = request.env['es.search'].query(index=product_index.name, body=data)
-
-        hits = res['hits']['hits']
-        hits_res = map(lambda r: r['_source'], hits)
+        hits_res = list(map(lambda r: r['_source'], res['hits']['hits']))
         total_hits = res['hits']['total']['value']
 
-        meta = dict(pagination=dict(count=len(hits), total=total_hits, current_page=page, per_page=limit,
+        meta = dict(pagination=dict(count=len(hits_res), total=total_hits, current_page=page, per_page=limit,
                                     total_pages=ceil(total_hits / int(limit))))
 
-        return json.dumps(dict(data=list(hits_res), meta=meta))
+        return json.dumps(dict(data=hits_res, meta=meta))
