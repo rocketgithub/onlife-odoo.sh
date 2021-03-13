@@ -17,10 +17,10 @@
                     <button name="action_update_document" type="object" string="Update Documents"
                             class="btn btn-primary"/>
                     <button name="action_refresh_index" type="object" string="Refresh Index" class="btn"/>
+                    <button name="action_check_index" type="object" string="Check Index" class="btn"/>
                     <!--
                     <button name="action_get_index" type="object" string="Get Index" class="btn"/>
                     <button name="action_put_mapping" type="object" string="Put Mapping" class="btn"/>
-                    <button name="action_check_index" type="object" string="Check Index" class="btn"/>
                     <button name="action_delete_index" type="object" string="Delete Index" class="btn"/>
                     -->
                 </tree>
@@ -60,6 +60,8 @@
                     </group>
                     <group>
                         <field name="fields_include" style="word-break:break-all" placeholder="[]"/>
+                        <field name="model_name" invisible="1"/>
+                        <field name="model_domain" invisible="1" widget="domain" options="{'model': 'model_name'}"/>
                         <!--
                         <field name="settings"/>
                         <field name="mapping"/>

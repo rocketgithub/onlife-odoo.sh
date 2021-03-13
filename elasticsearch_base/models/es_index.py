@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from ast import literal_eval
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -15,6 +16,7 @@ class EsIndex(models.Model):
     name = fields.Char('Name', readonly=True, compute='_compute_name', compute_sudo=True, store=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True, ondelete='cascade')
     model_name = fields.Char(string="Model Name", related='model_id.model', store=True)
+    model_domain = fields.Char(string='Domain', default=[])
     suffix = fields.Char('Suffix', compute='_compute_name', compute_sudo=True, store=True)
     active = fields.Boolean('Active', default=True)
     index_info = fields.Text('Index Info', readonly=True)
@@ -43,6 +45,9 @@ class EsIndex(models.Model):
                 rec.update(val)
         return True
 
+    def get_model_domain(self):
+        return literal_eval(self.model_domain) if self.model_domain else []
+
     def action_bulk_document(self):
         self._bulk_document()
 
@@ -59,12 +64,13 @@ class EsIndex(models.Model):
     def _bulk_document(self):
         limit = 1024
         model_obj = self.env[self.model_name]
-        record_count = model_obj.search_count([])
+        domain = self.get_model_domain()
+        record_count = model_obj.search_count(domain)
         _logger.info('Model records: %s', record_count)
         turns = record_count // limit
 
         for i in range(0, turns + 1):
-            records = model_obj.search_read_json([], fields=eval(self.fields_include) if self.fields_include else [],
+            records = model_obj.search_read_json(domain, fields=eval(self.fields_include) if self.fields_include else [],
                                                  limit=limit, offset=limit * i, order='id DESC')
             if records:
                 self.bulk_document(body=self._prepare_bulk_document(records), refresh=True, index=self.name)
@@ -76,7 +82,8 @@ class EsIndex(models.Model):
     def _create_document(self):
         limit = 16
         model_obj = self.env[self.model_name]
-        record_count = model_obj.search_count([])
+        domain = self.get_model_domain()
+        record_count = model_obj.search_count(domain)
         _logger.info('Model records: %s', record_count)
         turns = record_count // limit
 
@@ -95,12 +102,13 @@ class EsIndex(models.Model):
     def _update_document(self):
         limit = 16
         model_obj = self.env[self.model_name]
-        record_count = model_obj.search_count([])
+        domain = self.get_model_domain()
+        record_count = model_obj.search_count(domain)
         _logger.info('Model records: %s', record_count)
         turns = record_count // limit
 
         for i in range(0, turns + 1):
-            records = model_obj.search_read_json([], fields=eval(self.fields_include) if self.fields_include else [],
+            records = model_obj.search_read_json(domain, fields=eval(self.fields_include) if self.fields_include else [],
                                                  limit=limit, offset=limit * i, order='id DESC')
             for r in records:
                 if self.exists_document(index=self.name, doc_type='_doc', id=r['id']):
@@ -115,12 +123,13 @@ class EsIndex(models.Model):
     def _create_document_simple(self):
         limit = 100
         model_obj = self.env[self.model_name]
-        record_count = model_obj.search_count([])
+        domain = self.get_model_domain()
+        record_count = model_obj.search_count(domain)
         _logger.info('Model records: %s', record_count)
         turns = record_count // limit
 
         for i in range(0, turns + 1):
-            records = model_obj.search_read_json([], fields=eval(self.fields_simple) if self.fields_simple else [],
+            records = model_obj.search_read_json(domain, fields=eval(self.fields_simple) if self.fields_simple else [],
                                                  limit=limit, offset=limit * i, order='id DESC')
             for r in records:
                 if not self.exists_document(index=self.name, doc_type='_doc', id=r['id']):
@@ -134,12 +143,13 @@ class EsIndex(models.Model):
     def _update_document_simple(self):
         limit = 100
         model_obj = self.env[self.model_name]
-        record_count = model_obj.search_count([])
+        domain = self.get_model_domain()
+        record_count = model_obj.search_count(domain)
         _logger.info('Model records: %s', record_count)
         turns = record_count // limit
 
         for i in range(0, turns + 1):
-            records = model_obj.search_read_json([], fields=eval(self.fields_simple) if self.fields_simple else [],
+            records = model_obj.search_read_json(domain, fields=eval(self.fields_simple) if self.fields_simple else [],
                                                  limit=limit, offset=limit * i, order='id DESC')
             for r in records:
                 if self.exists_document(index=self.name, doc_type='_doc', id=r['id']):
@@ -151,12 +161,13 @@ class EsIndex(models.Model):
     def update_document_complex(self):
         limit = 16
         model_obj = self.env[self.model_name]
-        record_count = model_obj.search_count([])
+        domain = self.get_model_domain()
+        record_count = model_obj.search_count(domain)
         _logger.info('Model records: %s', record_count)
         turns = record_count // limit
 
         for i in range(0, turns + 1):
-            records = model_obj.search_read_json([], fields=eval(self.fields_complex) if self.fields_complex else [],
+            records = model_obj.search_read_json(domain, fields=eval(self.fields_complex) if self.fields_complex else [],
                                                  limit=limit, offset=limit * i, order='id DESC')
             for r in records:
                 if self.exists_document(index=self.name, doc_type='_doc', id=r['id']):
@@ -183,12 +194,10 @@ class EsIndex(models.Model):
 
     def action_refresh_index(self):
         res = self.refresh_index(index=self.name)
-        print(res)
         return res
 
     def action_delete_index(self):
         res = self.delete_index(index=self.name)
-        print(res)
         self.index_exists = False
         return res
 
@@ -199,12 +208,10 @@ class EsIndex(models.Model):
 
     def action_close_index(self):
         res = self.close_index(index=self.name)
-        print(res)
         return res
 
     def action_open_index(self):
         res = self.open_index(index=self.name)
-        print(res)
         return res
 
     def action_check_index(self):
