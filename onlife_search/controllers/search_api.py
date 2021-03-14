@@ -50,7 +50,7 @@ class OnlifeSearchAPI(Controller):
 
         should, must, post_filter = [], [], []
         query_list = keyword and keyword.split(',')
-        search_fields = ["keywords^10.0", "name^8.0", "description^2.0"]
+        search_fields = ["name^10.0", "keywords^8.0", "description^2.0"]
 
         if query_list:
             should.extend([dict(multi_match={
