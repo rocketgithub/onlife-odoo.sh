@@ -20,30 +20,39 @@ def get_sort_keys(s, d):
 class OnlifeSearchAPI(Controller):
 
     @route('/api/product/search', type='http', methods=['GET'], auth='none', csrf=False)
-    def product_fuzzy_search(self, keyword=None, brandId=None, brandName=None,
-                             limit=20, page=0, sort=None, direction=None):
+    def product_fuzzy_search(self, keyword=None, brandId=None, brandName=None, limit=20, page=0,
+                             sort=None, direction=None):
         product_index = request.env['es.index'].sudo().search([('model_id.model', '=', 'product.template')], limit=1)
 
-        # Prevent from overriding the global functions max and min
         params = request.params
-        max_, min_ = params.get('max', 0), params.get('min', 0)
 
         try:
             offset = int(page) * int(limit)
         except ValueError:
             offset = 0
 
+        try:
+            max_ = float(params.get('max'))
+        except (ValueError, TypeError):
+            max_ = None
+
+        try:
+            min_ = float(params.get('min'))
+        except (ValueError, TypeError):
+            min_ = None
+
         data = {
             "query": dict(bool={}),
             "size": limit,
             "from": offset,
+            "post_filter": dict(bool={}),
         }
 
-        should, must = [], []
-        query_list = keyword.split(',')
-        search_fields = ["keywords^10.0", "name^8.0", "description^2.0"]
+        should, must, post_filter = [], [], []
+        query_list = keyword and keyword.split(',')
+        search_fields = ["name^10.0", "keywords^8.0", "description^2.0"]
 
-        if keyword:
+        if query_list:
             should.extend([dict(multi_match={
                 "query": ' '.join(query_list),
                 "type": "phrase",
@@ -69,23 +78,23 @@ class OnlifeSearchAPI(Controller):
             must.append(dict(match={
                 "brand.name": brandName
             }))
+        if max_ or min_:
+            post_filter.append(dict(range={
+                "calculated_price": {
+                    "gte": min_,
+                    "lte": max_,
+                }
+            }))
+        post_filter.append(dict(term={
+            "is_visible": "true"
+        }))
 
         if should:
             data["query"]["bool"].update(dict(should=should))
-
         if must:
             data["query"]["bool"].update(dict(must=must))
-
-        if max_ or min_:
-            data.update(dict(post_filter={
-                "range": {
-                    'calculated_price': {
-                        "gte": float(min_) or None,
-                        "lte": float(max_) or None,
-                    }
-                }
-            }))
-
+        if post_filter:
+            data["post_filter"]["bool"].update(dict(must=post_filter))
         if sort:
             data.update({"sort": get_sort_keys(sort, direction)})
 
