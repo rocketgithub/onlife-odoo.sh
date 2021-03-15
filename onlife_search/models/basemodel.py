@@ -39,8 +39,14 @@ class BaseModelExtend(models.AbstractModel):
             product_model = self._name == 'product.template'
             if product_model:
                 fields = list(set(DEFAULT_PRODUCT_FIELDS + fields))
-            res = origin_search_read_json(self=self,domain=domain, fields=fields,
-                                          offset=offset, limit=limit, order=order)
+            # By default, Odoo performs search_read as is, so use context to define the languga
+            res = origin_search_read_json(
+                self=self.with_context(lang='es_GT') if product_model else self,
+                domain=domain,
+                fields=fields,
+                offset=offset,
+                limit=limit,
+                order=order)
             return [update_data_keys(vals) for vals in res] if product_model else res
 
         models.AbstractModel.search_read_json = search_read_json
