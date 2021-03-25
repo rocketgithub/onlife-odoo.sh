@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="onlife_search_product_template_only_form_view" model="ir.ui.view">
+        <field name="name">online_search.product.template.product.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='pricing']" position="after">
+                <label for="default_price"/>
+                <div name="default_pricing">
+                    <field name="default_price" widget='monetary'
+                           options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="onlife_search_product_template_view_tree" model="ir.ui.view">
+        <field name="name">onlife_search.product.template.view.tree</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="list_price" position="before">
+                <field name="default_price" optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

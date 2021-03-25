@@ -9,11 +9,11 @@ SORTING_DIRECTION = ('asc', 'desc')
 
 
 def get_sort_keys(s, d):
-    sort_keys = []
-    sort_dir = d and d.lower()
+    sort_keys, sort_dir = [], d and d.lower()
     for s_key in s.split(','):
-        s_key = SORT_KEY_MAP.get(s_key, s_key)
-        sort_keys.append({s_key: sort_dir} if sort_dir in SORTING_DIRECTION else s_key)
+        if s_key in SORT_KEY_MAP:
+            s_key = SORT_KEY_MAP.get(s_key, s_key)
+            sort_keys.append({s_key: sort_dir} if sort_dir in SORTING_DIRECTION else s_key)
     return sort_keys
 
 
