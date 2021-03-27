@@ -9,6 +9,5 @@ class SincProduct(models.AbstractModel):
     def campos(self):
         res = super(SincProduct, self).campos()
         clasicos = res.get('clasicos')
-        clasicos.remove(['list_price', 'sale_price'])
-        clasicos.append(['default_price', 'sale_price'])
+        clasicos.append(['default_price', 'price'])
         return res.update({'clasicos': clasicos})
