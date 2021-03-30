@@ -49,21 +49,22 @@ class OnlifeSearchAPI(Controller):
         }
 
         should, must, post_filter = [], [], []
-        query_list = keyword and keyword.split(',')
+        query_list = keyword and keyword.replace('-', '_').split(',')
         search_fields = ["name^10.0", "keywords^8.0", "description^2.0"]
 
         if query_list:
+            query = list(filter(None, query_list))
             should.extend([dict(multi_match={
-                "query": ' '.join(query_list),
+                "query": ' '.join(query),
                 "type": "phrase",
                 "fields": search_fields,
                 "boost": "10"
             }), dict(query_string={
-                "query": ' '.join(map(lambda k: k + '*', query_list)),
+                "query": ' '.join(map(lambda k: k + '*', query)),
                 "fields": search_fields,
                 "boost": "5"
             }), dict(multi_match={
-                "query": ' '.join(query_list),
+                "query": ' '.join(query),
                 "type": "most_fields",
                 "fields": search_fields,
                 "fuzziness": "AUTO"
