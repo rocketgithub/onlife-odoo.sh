@@ -3,7 +3,7 @@ from math import ceil
 
 from odoo.http import Controller, route, request
 
-SORT_KEY_MAP = dict([('name', 'name.keyword'),
+SORT_KEY_MAP = dict([('name', 'name.raw'),
                      ('price', 'calculated_price')])
 SORTING_DIRECTION = ('asc', 'desc')
 
@@ -103,7 +103,11 @@ class OnlifeSearchAPI(Controller):
         hits_res = list(map(lambda r: r['_source'], res['hits']['hits']))
         total_hits = res['hits']['total']['value']
 
-        meta = dict(pagination=dict(count=len(hits_res), total=total_hits, current_page=page, per_page=limit,
-                                    total_pages=ceil(total_hits / int(limit))))
-
+        meta = dict(pagination=dict(
+            count=len(hits_res),
+            total=total_hits,
+            current_page=page,
+            per_page=limit,
+            total_pages=ceil(total_hits / int(limit))
+        ))
         return json.dumps(dict(data=hits_res, meta=meta))
