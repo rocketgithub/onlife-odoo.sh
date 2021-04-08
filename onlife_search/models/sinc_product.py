@@ -10,4 +10,5 @@ class SincProduct(models.AbstractModel):
         res = super(SincProduct, self).campos()
         clasicos = res.get('clasicos')
         clasicos.append(['default_price', 'price'])
+        clasicos.append(['discount', 'discount'])
         return res.update({'clasicos': clasicos})
