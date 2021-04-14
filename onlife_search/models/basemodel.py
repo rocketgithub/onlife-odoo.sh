@@ -2,17 +2,18 @@ from odoo import api, models
 
 PRODUCT_FIELD_MAPPING = dict([('sinc_id', 'id'),
                               ('id', 'product_id'),
+                              ('default_price', 'price'),
                               ('list_price', 'calculated_price'),
                               ('public_categ_ids', 'categories'),
                               ('sale_ok', 'is_visible'),
                               ('marca_id', 'brand')])
 
-DEFAULT_PRODUCT_FIELDS = ['sinc_id', 'name', 'list_price', 'sale_ok', 'marca_id', 'description', 'keywords']
+DEFAULT_PRODUCT_FIELDS = ['sinc_id', 'name', 'default_price', 'discount', 'sale_ok',
+                          'marca_id', 'description', 'keywords', 'list_price']
 
 
 def update_data_keys(dict_):
-    new_dict = {}
-    images = []
+    new_dict, images= {}, []
     for k, v in dict_.items():
         new_k = PRODUCT_FIELD_MAPPING.get(k)
         if new_k:

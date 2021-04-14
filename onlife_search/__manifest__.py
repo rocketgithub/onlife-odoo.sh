@@ -2,7 +2,7 @@
 {
     # App information
     'name': "Fuzzy Search API for OnLife",
-    'version': '13.0.1.15',
+    'version': '13.0.1.18',
     'category': 'Inventory',
     'summary': """
 Provides Fuzzy Search API for OnLife""",
@@ -14,11 +14,13 @@ Provides Fuzzy Search API for OnLife""",
     # Dependencies
     'depends': [
         'base',
-        'elasticsearch_base'
+        'elasticsearch_base',
+        'sinc_bigcommerce'
     ],
 
     # Views, Data, Templates, etc.
     'data': [
+        'views/product_template.xml'
     ],
 
     'installable': True,

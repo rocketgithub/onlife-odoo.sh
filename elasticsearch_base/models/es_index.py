@@ -183,9 +183,9 @@ class EsIndex(models.Model):
         if not self.exists_index(index=self.name):
             res = self.create_index(index=self.name, body=eval(str.strip(self.settings)) if self.settings else None)
             if self.settings:
-                self.put_settings()
+                self.action_put_settings()
             if self.mapping:
-                self.put_mapping()
+                self.action_put_mapping()
             self.index_exists = True
             return res
         else:
@@ -226,7 +226,7 @@ class EsIndex(models.Model):
             raise ValidationError(_('Mapping info must be a dictionary: {key:value}'))
 
         body = eval(str.strip(self.mapping))
-        res = self.put_mapping(index=self.name, doc_type='_doc', body=body)
+        res = self.put_mapping(index=self.name, doc_type='_doc', body=body, include_type_name=True)
         return res
 
     def action_put_settings(self):

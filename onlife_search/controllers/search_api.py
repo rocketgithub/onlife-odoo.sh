@@ -3,17 +3,17 @@ from math import ceil
 
 from odoo.http import Controller, route, request
 
-SORT_KEY_MAP = dict([('name', 'name.keyword'),
+SORT_KEY_MAP = dict([('name', 'name.raw'),
                      ('price', 'calculated_price')])
 SORTING_DIRECTION = ('asc', 'desc')
 
 
 def get_sort_keys(s, d):
-    sort_keys = []
-    sort_dir = d and d.lower()
+    sort_keys, sort_dir = [], d and d.lower()
     for s_key in s.split(','):
-        s_key = SORT_KEY_MAP.get(s_key, s_key)
-        sort_keys.append({s_key: sort_dir} if sort_dir in SORTING_DIRECTION else s_key)
+        if s_key in SORT_KEY_MAP:
+            s_key = SORT_KEY_MAP.get(s_key, s_key)
+            sort_keys.append({s_key: sort_dir} if sort_dir in SORTING_DIRECTION else s_key)
     return sort_keys
 
 
@@ -49,21 +49,22 @@ class OnlifeSearchAPI(Controller):
         }
 
         should, must, post_filter = [], [], []
-        query_list = keyword and keyword.split(',')
+        query_list = keyword and keyword.replace('-', '_').split(',')
         search_fields = ["name^10.0", "keywords^8.0", "description^2.0"]
 
         if query_list:
+            query = list(filter(None, query_list))
             should.extend([dict(multi_match={
-                "query": ' '.join(query_list),
+                "query": ' '.join(query),
                 "type": "phrase",
                 "fields": search_fields,
                 "boost": "10"
             }), dict(query_string={
-                "query": ' '.join(map(lambda k: k + '*', query_list)),
+                "query": ' '.join(map(lambda k: k + '*', query)),
                 "fields": search_fields,
                 "boost": "5"
             }), dict(multi_match={
-                "query": ' '.join(query_list),
+                "query": ' '.join(query),
                 "type": "most_fields",
                 "fields": search_fields,
                 "fuzziness": "AUTO"
@@ -102,7 +103,11 @@ class OnlifeSearchAPI(Controller):
         hits_res = list(map(lambda r: r['_source'], res['hits']['hits']))
         total_hits = res['hits']['total']['value']
 
-        meta = dict(pagination=dict(count=len(hits_res), total=total_hits, current_page=page, per_page=limit,
-                                    total_pages=ceil(total_hits / int(limit))))
-
+        meta = dict(pagination=dict(
+            count=len(hits_res),
+            total=total_hits,
+            current_page=page,
+            per_page=limit,
+            total_pages=ceil(total_hits / int(limit))
+        ))
         return json.dumps(dict(data=hits_res, meta=meta))
