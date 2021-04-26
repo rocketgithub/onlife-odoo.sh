@@ -13,7 +13,7 @@ class EsIndex(models.Model):
     _name = 'es.index'
     _description = 'ES Index'
 
-    name = fields.Char('Name', readonly=True, compute='_compute_name', compute_sudo=True, store=True)
+    name = fields.Char('Name', readonly=False, store=True, copy=False, required=True)
     model_id = fields.Many2one('ir.model', string="Model", required=True, ondelete='cascade')
     model_name = fields.Char(string="Model Name", related='model_id.model', store=True)
     model_domain = fields.Char(string='Domain', default=[])
@@ -31,19 +31,14 @@ class EsIndex(models.Model):
         ('name_uniq', 'unique(name)', _('Index must be unique!'))
     ]
 
-    @api.depends('model_id')
-    def _compute_name(self):
+    @api.onchange('model_id')
+    def _change_index_name(self):
         ICPSudo = self.env['ir.config_parameter'].sudo()
         database_uuid = ICPSudo.get_param('database.uuid')
         suffix = "%s" % (database_uuid[0:8])
-        for rec in self:
-            if rec.model_id:
-                val = {
-                    'name': "%s-%s" % (rec.model_id.model.replace('.', '-'), suffix),
-                    'suffix': suffix
-                }
-                rec.update(val)
-        return True
+        if self.model_id:
+                self.name = "%s-%s" % (self.model_id.model.replace('.', '-'), suffix)
+                self.suffix = suffix
 
     def get_model_domain(self):
         return literal_eval(self.model_domain) if self.model_domain else []
