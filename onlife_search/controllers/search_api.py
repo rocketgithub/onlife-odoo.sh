@@ -1,6 +1,7 @@
 import json
 from math import ceil
 from odoo.http import Controller, route, request
+from elasticsearch.exceptions import NotFoundError
 from pprint import pprint
 
 SORT_KEY_MAP = dict([('name', 'name.raw'),
@@ -114,15 +115,11 @@ class OnlifeSearchAPI(Controller):
 
     @route('/api/product/live-search', type='http', methods=['GET'], auth='none', csrf=False)
     def product_live_search(self, keyword=None):
-        product_index = request.env['es.index'].sudo().search(
-            [('name', '=', 'product-template-live-search'), ('index_exists', '=', True)], limit=1)
         result = dict(data=[])
-        if not product_index:
-            result['error'] = "Missing ES index named 'product-template-live-search'! Please create this index in Odoo."
 
         query_list = keyword and keyword.replace('-', '_').split(',')
 
-        if query_list and product_index:
+        if query_list:
             data = {
                 "query": dict(bool={}),
                 "size": 10,
@@ -157,7 +154,11 @@ class OnlifeSearchAPI(Controller):
             if should:
                 data["query"]["bool"].update(dict(should=should))
 
-            res = request.env['es.search'].query(index=product_index.name, body=data)
-            result['data'] = list(map(lambda r: r['_source'], res['hits']['hits']))
+            try:
+                res = request.env['es.search'].query(index='product-template-live-search', body=data)
+                result['data'] = list(map(lambda r: r['_source'], res['hits']['hits']))
+            except NotFoundError:
+                result.update(
+                    error="Missing ES index named 'product-template-live-search'! Please create this index in Odoo.")
 
         return json.dumps(result)
