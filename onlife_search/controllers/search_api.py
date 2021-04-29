@@ -1,7 +1,8 @@
 import json
 from math import ceil
-
 from odoo.http import Controller, route, request
+from elasticsearch.exceptions import NotFoundError
+from pprint import pprint
 
 SORT_KEY_MAP = dict([('name', 'name.raw'),
                      ('price', 'calculated_price')])
@@ -111,3 +112,53 @@ class OnlifeSearchAPI(Controller):
             total_pages=ceil(total_hits / int(limit))
         ))
         return json.dumps(dict(data=hits_res, meta=meta))
+
+    @route('/api/product/live-search', type='http', methods=['GET'], auth='none', csrf=False)
+    def product_live_search(self, keyword=None):
+        result = dict(data=[])
+
+        query_list = keyword and keyword.replace('-', '_').split(',')
+
+        if query_list:
+            data = {
+                "query": dict(bool={}),
+                "size": 10,
+                "post_filter": {
+                    'bool': {
+                        'must': [{'term': {
+                            'is_visible': "true"
+                        }
+                        }, ]
+                    }
+                },
+            }
+            should = []
+            search_fields = ['name']
+            query = list(filter(None, query_list))
+            should.extend([dict(multi_match={
+                "query": ' '.join(query),
+                "type": "phrase",
+                "fields": search_fields,
+                "boost": "10"
+            }), dict(query_string={
+                "query": ' '.join(map(lambda k: k + '*', query)),
+                "fields": search_fields,
+                "boost": "5"
+            }), dict(multi_match={
+                "query": ' '.join(query),
+                "type": "most_fields",
+                "fields": search_fields,
+                "fuzziness": "AUTO"
+            })])
+
+            if should:
+                data["query"]["bool"].update(dict(should=should))
+
+            try:
+                res = request.env['es.search'].query(index='product-template-live-search', body=data)
+                result['data'] = list(map(lambda r: r['_source'], res['hits']['hits']))
+            except NotFoundError:
+                result.update(
+                    error="Missing ES index named 'product-template-live-search'! Please create this index in Odoo.")
+
+        return json.dumps(result)

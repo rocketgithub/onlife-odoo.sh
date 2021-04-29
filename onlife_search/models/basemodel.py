@@ -8,12 +8,9 @@ PRODUCT_FIELD_MAPPING = dict([('sinc_id', 'id'),
                               ('sale_ok', 'is_visible'),
                               ('marca_id', 'brand')])
 
-DEFAULT_PRODUCT_FIELDS = ['sinc_id', 'name', 'default_price', 'discount', 'sale_ok',
-                          'marca_id', 'description', 'keywords', 'list_price']
-
 
 def update_data_keys(dict_):
-    new_dict, images= {}, []
+    new_dict, images = {}, []
     for k, v in dict_.items():
         new_k = PRODUCT_FIELD_MAPPING.get(k)
         if new_k:
@@ -39,8 +36,8 @@ class BaseModelExtend(models.AbstractModel):
         def search_read_json(self, domain=None, fields=None, offset=0, limit=None, order=None):
             product_model = self._name == 'product.template'
             if product_model:
-                fields = list(set(DEFAULT_PRODUCT_FIELDS + fields))
-            # By default, Odoo performs search_read as is, so use context to define the languga
+                fields += ['name', 'sinc_id', 'sale_ok']
+            # By default, Odoo performs search_read as is, so use context to define the language
             res = origin_search_read_json(
                 self=self.with_context(lang='es_GT') if product_model else self,
                 domain=domain,
