@@ -156,7 +156,11 @@ class OnlifeSearchAPI(Controller):
 
             try:
                 res = request.env['es.search'].query(index='product-template-live-search', body=data)
-                result['data'] = list(map(lambda r: r['_source'], res['hits']['hits']))
+                res_data = list(map(lambda r: r['_source'], res['hits']['hits']))
+                for item in res_data:
+                    # Remove is_visible in payload
+                    item.pop('is_visible')
+                result['data'] = res_data
             except NotFoundError:
                 result.update(
                     error="Missing ES index named 'product-template-live-search'! Please create this index in Odoo.")
