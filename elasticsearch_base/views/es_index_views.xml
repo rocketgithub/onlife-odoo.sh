@@ -7,10 +7,10 @@
             <field name="model">es.index</field>
             <field name="arch" type="xml">
                 <tree string="Search Engine Index">
-                    <field name="name"/>
-                    <field name="model_id"/>
+                    <field name="name" attrs="{'readonly': [('index_exists', '=', True)]}"/>
+                    <field name="model_id" attrs="{'readonly': [('index_exists', '=', True)]}"/>
                     <field name="index_exists"/>
-                    <field name="fields_include"/>
+                    <field name="fields_include" attrs="{'readonly': [('index_exists', '=', True)]}"/>
                     <!--
                     <button name="action_create_index" type="object" string="Create Index" class="btn btn-primary"/>
                     -->
@@ -51,19 +51,22 @@
                     </header>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="model_id"/>
+                            <field name="name" attrs="{'readonly': [('index_exists', '=', True)]}"/>
+                            <field name="model_id" attrs="{'readonly': [('index_exists', '=', True)]}"/>
                         </group>
                         <group>
                             <field name="index_exists"/>
                         </group>
                     </group>
                     <group>
-                        <field name="fields_include" style="word-break:break-all" placeholder="[]"/>
+                        <field name="fields_include"
+                               style="word-break:break-all"
+                               placeholder="[]"
+                               attrs="{'readonly': [('index_exists', '=', True)]}"/>
                         <field name="model_name" invisible="1"/>
                         <field name="model_domain" invisible="1" widget="domain" options="{'model': 'model_name'}"/>
-                        <field name="settings"/>
-                        <field name="mapping"/>
+                        <field name="settings" attrs="{'readonly': [('index_exists', '=', True)]}"/>
+                        <field name="mapping" attrs="{'readonly': [('index_exists', '=', True)]}"/>
                         <field name="index_info"/>
                     </group>
                 </form>
