@@ -2,7 +2,6 @@ import json
 from math import ceil
 from odoo.http import Controller, route, request
 from elasticsearch.exceptions import NotFoundError
-import re
 from pprint import pprint
 
 SORT_KEY_MAP = dict([('name', 'name.raw'),
@@ -20,14 +19,6 @@ def get_sort_keys(s, d):
 
 
 class OnlifeSearchAPI(Controller):
-
-    @staticmethod
-    def _clean_keyword(keyword=False):
-        if isinstance(keyword, str):
-            keyword = keyword.strip().replace('-', '_')
-            keyword = re.sub('\W+', ' ', keyword)
-
-        return keyword
 
     @route('/api/product/search', type='http', methods=['GET'], auth='none', csrf=False)
     def product_fuzzy_search(self, keyword=None, brandId=None, brandName=None, limit=20, page=0,
@@ -59,8 +50,7 @@ class OnlifeSearchAPI(Controller):
         }
 
         should, must, post_filter = [], [], []
-        keyword = self._clean_keyword(keyword)
-        query_list = keyword and keyword.split(',')
+        query_list = keyword and keyword.replace('-', '_').split(',')
         search_fields = ["name^10.0", "keywords^8.0", "description^2.0"]
 
         if query_list:
@@ -126,8 +116,8 @@ class OnlifeSearchAPI(Controller):
     @route('/api/product/live-search', type='http', methods=['GET'], auth='none', csrf=False)
     def product_live_search(self, keyword=None):
         result = dict(data=[])
-        keyword = self._clean_keyword(keyword)
-        query_list = keyword and keyword.split(',')
+
+        query_list = keyword and keyword.replace('-', '_').split(',')
 
         if query_list:
             data = {
